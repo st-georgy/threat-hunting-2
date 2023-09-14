@@ -2,6 +2,8 @@ lab1
 ================
 Zhidkov Georgy
 
+## 1. Basic Building Blocks
+
 In its simplest form, R can be used as an interactive calculator. Type
 5 + 7 and press Enter.
 
@@ -125,3 +127,183 @@ z * 2 + 1000
 ```
 
     [1] 1002.20 1018.00 1006.28
+
+## 2. Workspace and Files
+
+Determine which directory your R session is using as its current working
+directory using getwd().
+
+``` r
+getwd()
+```
+
+    [1] "C:/Users/zhidk/source/repos/threat-hunting-2/lab1"
+
+List all the objects in your local workspace using ls()
+
+``` r
+ls()
+```
+
+    [1] "my_div"  "my_sqrt" "x"       "y"       "z"      
+
+Assign 9 to x using x \<- 9.
+
+``` r
+x <- 9
+```
+
+Now take a look at objects that are in your workspace using ls().
+
+``` r
+ls()
+```
+
+    [1] "my_div"  "my_sqrt" "x"       "y"       "z"      
+
+List all the files in your working directory using list.files()
+
+``` r
+list.files()
+```
+
+    [1] "lab1.qmd"       "lab1.rmarkdown" "README.md"     
+
+or dir().
+
+``` r
+dir()
+```
+
+    [1] "lab1.qmd"       "lab1.rmarkdown" "README.md"     
+
+As we go through this lesson, you should be examining the help page for
+each new function. Check out the help page for list.files with the
+command ?list.files.
+
+``` r
+?list.files
+```
+
+Using the args() function on a function name is also a handy way to see
+what arguments a function can take.
+
+``` r
+args(list.files)
+```
+
+    function (path = ".", pattern = NULL, all.files = FALSE, full.names = FALSE, 
+        recursive = FALSE, ignore.case = FALSE, include.dirs = FALSE, 
+        no.. = FALSE) 
+    NULL
+
+Assign the value of the current working directory to a variable called
+“old.dir”.
+
+``` r
+old.dir <- getwd()
+```
+
+Use dir.create() to create a directory in the current working directory
+called “testdir”.
+
+``` r
+dir.create("testdir")
+```
+
+Set your working directory to “testdir” with the setwd() command.
+
+``` r
+setwd("testdir")
+```
+
+Create a file in your working directory called “mytest.R” using the
+file.create() function.
+
+``` r
+file.create("mytest.R")
+```
+
+    [1] TRUE
+
+This should be the only file in this newly created directory. Let’s
+check this by listing all the files in the current directory.
+
+``` r
+list.files()
+```
+
+    [1] "lab1.qmd"       "lab1.rmarkdown" "mytest.R"       "README.md"     
+    [5] "testdir"       
+
+Check to see if “mytest.R” exists in the working directory using the
+file.exists() function.
+
+``` r
+file.exists("mytest.R")
+```
+
+    [1] TRUE
+
+Access information about the file “mytest.R” by using file.info().
+
+``` r
+file.info("mytest.R")
+```
+
+             size isdir mode               mtime               ctime
+    mytest.R    0 FALSE  666 2023-09-14 14:55:21 2023-09-14 14:55:21
+                           atime exe
+    mytest.R 2023-09-14 14:55:21  no
+
+Change the name of the file “mytest.R” to “mytest2.R” by using
+file.rename().
+
+``` r
+file.rename("mytest.R", "mytest2.R")
+```
+
+    [1] TRUE
+
+Make a copy of “mytest2.R” called “mytest3.R” using file.copy().
+
+``` r
+file.copy("mytest2.R", "mytest3.R")
+```
+
+    [1] TRUE
+
+Provide the relative path to the file “mytest3.R” by using file.path().
+
+``` r
+file.path("mytest3.R")
+```
+
+    [1] "mytest3.R"
+
+You can use file.path to construct file and directory paths that are
+independent of the operating system your R code is running on. Pass
+‘folder1’ and ‘folder2’ as arguments to file.path to make a
+platform-independent pathname.
+
+``` r
+file.path("folder1", "folder2")
+```
+
+    [1] "folder1/folder2"
+
+Create a directory in the current working directory called “testdir2”
+and a subdirectory for it called “testdir3”, all in one command by using
+dir.create() and file.path().
+
+``` r
+dir.create(file.path('testdir2', 'testdir3'), recursive = TRUE)
+```
+
+Go back to your original working directory using setwd(). (Recall that
+we created the variable old.dir with the full path for the orginal
+working directory at the start of these questions.)
+
+``` r
+setwd(old.dir)
+```
