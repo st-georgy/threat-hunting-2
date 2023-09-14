@@ -1,8 +1,36 @@
-lab1
+Информационно-аналитические технологии поиска угроз информационной
+безопасности
 ================
 Zhidkov Georgy
 
-## 1. Basic Building Blocks
+Лабораторная работа №1
+
+## Цель
+
+Пройти 4 урока по R Programming в swirl
+
+## Исходные данные
+
+1.  ОС Windows 11
+2.  RStudio Desktop
+3.  Интерпретатор языка R 4.2.2
+4.  Swirl
+
+## План
+
+1.  Установить пакет swirl
+2.  Запустить в консоли swirl::swirl()
+3.  Пройти 4 урока
+
+## Шаги
+
+### Установка swirl
+
+Пакет swirl можно установить в RStudio Desktop с помощью команды
+install.packages(“swirl”) После успешной установки в консоли пишем
+команду swirl::swirl() и начинаем прохождение уроков.
+
+### 1. Basic Building Blocks
 
 In its simplest form, R can be used as an interactive calculator. Type
 5 + 7 and press Enter.
@@ -128,7 +156,7 @@ z * 2 + 1000
 
     [1] 1002.20 1018.00 1006.28
 
-## 2. Workspace and Files
+### 2. Workspace and Files
 
 Determine which directory your R session is using as its current working
 directory using getwd().
@@ -252,9 +280,9 @@ file.info("mytest.R")
 ```
 
              size isdir mode               mtime               ctime
-    mytest.R    0 FALSE  666 2023-09-14 15:18:51 2023-09-14 15:18:51
+    mytest.R    0 FALSE  666 2023-09-14 15:29:14 2023-09-14 15:29:14
                            atime exe
-    mytest.R 2023-09-14 15:18:51  no
+    mytest.R 2023-09-14 15:29:14  no
 
 Change the name of the file “mytest.R” to “mytest2.R” by using
 file.rename().
@@ -308,7 +336,7 @@ working directory at the start of these questions.)
 setwd(old.dir)
 ```
 
-## 3. Sequences of Numbers
+### 3. Sequences of Numbers
 
 The simplest way to create a sequence of numbers in R is by using the
 `:` operator. Type 1:20 to see how it works.
@@ -447,7 +475,7 @@ rep(c(0, 1, 2), each = 10)
 
      [1] 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
 
-## 4. Vectors
+### 4. Vectors
 
 First, create a numeric vector num_vect that contains the values 0.5,
 55, -10, and 6.
@@ -548,3 +576,12 @@ paste(LETTERS, 1:4, sep = "-")
      [1] "A-1" "B-2" "C-3" "D-4" "E-1" "F-2" "G-3" "H-4" "I-1" "J-2" "K-3" "L-4"
     [13] "M-1" "N-2" "O-3" "P-4" "Q-1" "R-2" "S-3" "T-4" "U-1" "V-2" "W-3" "X-4"
     [25] "Y-1" "Z-2"
+
+## Оценка результата
+
+В результате лабораторной работы мы прошли 4 урока по языку
+программирования R, тем самым разобравшись в базовых аспектах языка.
+
+## Вывод
+
+Мы получили базовые навыки работы с RStudio Desktop и языком R
