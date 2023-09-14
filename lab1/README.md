@@ -252,9 +252,9 @@ file.info("mytest.R")
 ```
 
              size isdir mode               mtime               ctime
-    mytest.R    0 FALSE  666 2023-09-14 15:07:33 2023-09-14 15:07:33
+    mytest.R    0 FALSE  666 2023-09-14 15:18:51 2023-09-14 15:18:51
                            atime exe
-    mytest.R 2023-09-14 15:07:33  no
+    mytest.R 2023-09-14 15:18:51  no
 
 Change the name of the file “mytest.R” to “mytest2.R” by using
 file.rename().
@@ -446,3 +446,105 @@ rep(c(0, 1, 2), each = 10)
 ```
 
      [1] 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2
+
+## 4. Vectors
+
+First, create a numeric vector num_vect that contains the values 0.5,
+55, -10, and 6.
+
+``` r
+num_vect <- c(0.5, 55, -10, 6)
+```
+
+Now, create a variable called tf that gets the result of num_vect \< 1,
+which is read as ‘num_vect is less than 1’.
+
+``` r
+tf <- num_vect < 1
+tf
+```
+
+    [1]  TRUE FALSE  TRUE FALSE
+
+Let’s try another. Type num_vect \>= 6 without assigning the result to a
+new variable.
+
+``` r
+num_vect >= 6
+```
+
+    [1] FALSE  TRUE FALSE  TRUE
+
+Create a character vector that contains the following words: “My”,
+“name”, “is”. Remember to enclose each word in its own set of double
+quotes, so that R knows they are character strings. Store the vector in
+a variable called my_char.
+
+``` r
+my_char <- c("My", "name", "is")
+my_char
+```
+
+    [1] "My"   "name" "is"  
+
+Type paste(my_char, collapse = ” “) now. Make sure there’s a space
+between the double quotes in the `collapse` argument. You’ll see why in
+a second.
+
+``` r
+paste(my_char, collapse = " ")
+```
+
+    [1] "My name is"
+
+To add (or ‘concatenate’) your name to the end of my_char, use the c()
+function like this: c(my_char, “your_name_here”). Place your name in
+double quotes where I’ve put “your_name_here”. Try it now, storing the
+result in a new variable called my_name.
+
+``` r
+my_name <- c(my_char, "Georgy")
+my_name
+```
+
+    [1] "My"     "name"   "is"     "Georgy"
+
+Now, use the paste() function once more to join the words in my_name
+together into a single character string. Don’t forget to say collapse =
+” “!
+
+``` r
+paste(my_name, collapse = " ")
+```
+
+    [1] "My name is Georgy"
+
+In the simplest case, we can join two character vectors that are each of
+length 1 (i.e. join two words). Try paste(“Hello”,“world!”, sep = ” “),
+where the `sep` argument tells R that we want to separate the joined
+elements with a single space.
+
+``` r
+paste("Hello", "world!", sep = " ")
+```
+
+    [1] "Hello world!"
+
+For a slightly more complicated example, we can join two vectors, each
+of length 3. Use paste() to join the integer vector 1:3 with the
+character vector c(“X”, “Y”, “Z”). This time, use sep = “” to leave no
+space between the joined elements.
+
+``` r
+paste(1:3, c("X", "Y", "Z"), sep = "")
+```
+
+    [1] "1X" "2Y" "3Z"
+
+``` r
+paste(LETTERS, 1:4, sep = "-")
+```
+
+     [1] "A-1" "B-2" "C-3" "D-4" "E-1" "F-2" "G-3" "H-4" "I-1" "J-2" "K-3" "L-4"
+    [13] "M-1" "N-2" "O-3" "P-4" "Q-1" "R-2" "S-3" "T-4" "U-1" "V-2" "W-3" "X-4"
+    [25] "Y-1" "Z-2"
