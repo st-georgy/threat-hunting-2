@@ -1,0 +1,217 @@
+---
+title: "Информационно-аналитические технологии поиска угроз информационной безопасности"
+author: "Zhidkov Georgy"
+format: 
+    md:
+        output-file: README.md
+---
+
+Лабораторная работа №4
+
+## Цель
+
+1.  Зекрепить практические навыки использования языка программирования R для обработки данных
+2.  Закрепить знания основных функций обработки данных экосистемы tidyverse языка R
+3.  Закрепить навыки исследования метаданных DNS трафика
+
+## Исходные данные
+
+1.  ОС Windows 11
+2.  RStudio Desktop
+3.  Интерпретатор языка R 4.2.2
+4.  dplyr
+
+## План
+
+1.  Установить пакет 'dplyr'
+2.  Импорт и подготовка данных DNS
+3.  Анализ данных
+4.  Обогащение данных
+
+## Шаги
+
+### Установка dplyr
+
+Пакет dplyr можно установить в RStudio Desktop с помощью команды install.packages("dplyr") Далее подключим пакет к текущему проекте с помощью library(dplyr)
+
+```{r}
+library(dplyr)
+```
+
+### Импорт и подготовка данных DNS
+
+#### 1. Импортируйте данные DNS
+
+```{r}
+dns_data <- read.table("dns.log", header = FALSE, sep = "\t", quote = "", encoding="UTF-8")
+```
+
+#### 2. Добавьте пропущенные данные о структуре данных (назначении столбцов)
+
+В файле header.csv хранится не вся нужная информация. Пользуясь открытыми источниками (в т.ч. документация zeek), исправим файл с заголовками. Итоговый вариант выглядит так:
+
+    Field ,Type 
+    ts,time,Timestamp of the DNS request
+    uid,string,Unique id of the connection 
+    id.orig_h,addr,The source IP address of the host that initiated the DNS query. 
+    id.orig_p,port,The source port of the host that initiated the DNS query.
+    id.resp_h,addr,The destination IP address, typically the DNS server, that received the DNS query.
+    id_resp_p,port,The destination port number, usually port 53 for DNS, on the server that received the DNS query.
+    proto,enum,Protocol of DNS transaction – TCP or UDP 
+    trans_id,count,16 bit identifier assigned by DNS client; responses match 
+    query,string,Domain name subject of the query 
+    qclass,count,Value specifying the query class 
+    qclass_name,string,Descriptive name of the query class (e.g. C_INTERNET) 
+    qtype,count,Value specifying the query type 
+    qtype_name,string,"Name of the query type (e.g. A, AAAA, PTR) "
+    rcode,count,Response code value in the DNS response 
+    rcode_name,string,"Descriptive name of the response code (e.g. NOERROR, NXDOMAIN) "
+    AA,bool,Authoritative Answer. T = server is authoritative for query 
+    TC,bool,Truncation. T = message was truncated Recursion Desired. 
+    RD,bool,T = request recursive lookup of query
+    RA,bool,Recursion Available. T = server supports recursive queries 
+    Z,count,"Reserved field, should be zero in all queries & responses "
+    answers,vector,List of resource descriptions in answer to the query 
+    TTLs,vector,Caching intervals of the answers 
+    rejected,bool,Whether the DNS query was rejected by the server 
+
+```{r}
+colnames(dns_data) <- read.csv("header.csv", header = FALSE, skip = 1)$V1
+```
+
+#### 3. Просмотрите общую структуру данных с помощью функции glimpse()
+
+```{r}
+dns_data %>%
+  glimpse()
+```
+
+### Анализ данных
+
+#### 4. Сколько участников информационного обмена в сети Доброй Организации?
+
+```{r}
+orig_h <- unique(dns_data$`id.orig_h`)
+resp_h <- unique(dns_data$`id.resp_h`)
+
+hosts <- c(orig_h, resp_h)
+
+hosts %>%
+  unique() %>%
+  length()
+```
+
+#### 5. Какое соотношение участников обмена внутри сети и участников обращений к внешним ресурсам?
+
+```{r}
+internal_ip_pattern <- c("192.168.", "10.", "100.([6-9]|1[0-1][0-9]|12[0-7]).", "172.((1[6-9])|(2[0-9])|(3[0-1])).")
+internal_ips <- hosts[grep(paste(internal_ip_pattern, collapse = "|"), hosts)]
+internal_ips_cnt <- sum(hosts %in% internal_ips)
+external_ips_cnt <- length(hosts) - internal_ips_cnt
+
+ratio <- internal_ips_cnt / external_ips_cnt
+ratio
+```
+
+#### 6. Найдите топ-10 участников сети, проявляющих наибольшую сетевую активность.
+
+```{r}
+top_hosts <- dns_data %>%
+  group_by(id.orig_h) %>%
+  summarise(request_count = n()) %>%
+  arrange(desc(request_count)) %>%
+  top_n(10, request_count)
+
+print(top_hosts)
+```
+
+#### 7. Найдите топ-10 доменов, к которым обращаются пользователи сети и соответственное количество обращений
+
+```{r}
+top_domains <- dns_data %>%
+  group_by(query) %>%
+  summarise(request_count = n()) %>%
+  arrange(desc(request_count)) %>%
+  top_n(10, request_count)
+
+print(top_domains)
+```
+
+#### 8. Опеределите базовые статистические характеристики (функция summary()) интервала времени между последовательным обращениями к топ-10 доменам.
+
+```{r}
+top_domains_filtered <- dns_data %>% 
+  filter(tolower(query) %in% top_domains$query) %>%
+  arrange(ts)
+time_intervals <- diff(top_domains_filtered$ts)
+
+summary(time_intervals)
+```
+
+#### 9. Часто вредоносное программное обеспечение использует DNS канал в качестве канала управления, периодически отправляя запросы на подконтрольный злоумышленникам DNS сервер. По периодическим запросам на один и тот же домен можно выявить скрытый DNS канал. Есть ли такие IP адреса в исследуемом датасете?
+
+```{r}
+ip_domain_counts <- dns_data %>%
+  group_by(ip = `id.orig_h`, query) %>%
+  summarise(request_count = n()) %>%
+  filter(request_count > 1)
+```
+
+```{r}
+unique_ips_with_periodic_requests <- unique(ip_domain_counts$ip)
+
+unique_ips_with_periodic_requests %>% length()
+unique_ips_with_periodic_requests %>% head()
+```
+
+### Обогащение данных
+
+#### 10. Определите местоположение (страну, город) и организацию-провайдера для топ-10 доменов. Для этого можно использовать сторонние сервисы, например https://v4.ifconfig.co/.
+
+```{r}
+top_domains
+```
+
+1.  teredo.ipv6.microsoft.com
+
+-   IP: 20.112.250.133
+-   Country: United States
+-   Timezone: America/Chicago
+-   Organization: Microsoft
+
+2.  tools.google.com
+
+-   IP: 173.194.222.100
+-   Country: United States
+-   Timezone: America/Chicago
+-   Organization: Google
+
+3.  www.apple.com
+
+-   IP: 17.253.144.10
+-   Country: United States
+-   Timezone: America/Chicago
+-   Organization: Apple-Engineering
+
+4.  safebrowsing.clients.google.com
+
+-   IP: 64.233.164.100
+-   Country: United States
+-   Timezone: America/Chicago
+-   Organization: Google
+
+5.  44.206.168.192.in-addr.arpa
+
+-   IP: 44.206.168.192
+-   Country: United States
+-   City: Ashburn
+-   Timezone: America/New_York
+-   Organization: Amazon
+
+## Оценка результата
+
+В результате лабораторной работы были выполнены задания с использованием пакета dplyr
+
+## Вывод
+
+В ходе лабораторной работы были импортированы, подготовлены, проанализированы и обогащены данные трафика DNS.
